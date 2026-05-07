@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Search &mdash; 8TechBank{% endblock %}
+{% block content %}
+<h1>Knowledge-base search</h1>
+<form method="get" action="{{ url_for('search') }}">
+    <label>Query
+        <input type="text" name="q" value="{{ query }}" maxlength="200">
+    </label>
+    <button type="submit" class="primary">Search</button>
+</form>
+
+{% if query %}
+    {# FIX 2: query is autoescaped by Jinja by default. CSP also blocks
+       inline scripts even if escaping ever fails. #}
+    <p>Results for: <strong>{{ query }}</strong></p>
+    <p class="muted">No results found in 8TechBank knowledge base.</p>
+{% endif %}
+{% endblock %}

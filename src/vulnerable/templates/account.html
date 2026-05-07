@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Account {{ account['acct_number'] }} &mdash; 8TechBank{% endblock %}
+{% block content %}
+<h1>Account {{ account['acct_number'] }}</h1>
+<div class="card">
+    <p><strong>Owner:</strong> {{ owner['full_name'] or owner['username'] }}</p>
+    <p><strong>Email:</strong> {{ owner['email'] }}</p>
+    <p><strong>Balance:</strong> UGX {{ '%0.2f' % account['balance'] }}</p>
+</div>
+
+<h2>Transactions on this account</h2>
+<table class="data">
+    <thead><tr><th>Date</th><th>From acct ID</th><th>To acct ID</th><th>Amount</th><th>Note</th></tr></thead>
+    <tbody>
+    {% for t in txns %}
+        <tr>
+            <td>{{ t['created_at'] }}</td>
+            <td>{{ t['from_acct'] }}</td>
+            <td>{{ t['to_acct'] }}</td>
+            <td>UGX {{ '%0.2f' % t['amount'] }}</td>
+            <td>{{ t['note'] | safe }}</td>
+        </tr>
+    {% else %}
+        <tr><td colspan="5" class="muted">No transactions.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

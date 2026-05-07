@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Admin &mdash; 8TechBank{% endblock %}
+{% block content %}
+<h1>Admin panel</h1>
+<p class="muted">Admins only. Password hashes are never displayed.</p>
+
+<h2>Users</h2>
+<table class="data">
+    <thead><tr><th>ID</th><th>Username</th><th>Full name</th><th>Email</th><th>Role</th></tr></thead>
+    <tbody>
+    {% for u in users %}
+        <tr>
+            <td>{{ u['id'] }}</td>
+            <td>{{ u['username'] }}</td>
+            <td>{{ u['full_name'] }}</td>
+            <td>{{ u['email'] }}</td>
+            <td>{{ u['role'] }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<h2>Accounts</h2>
+<table class="data">
+    <thead><tr><th>ID</th><th>User ID</th><th>Number</th><th>Balance</th></tr></thead>
+    <tbody>
+    {% for a in accounts %}
+        <tr>
+            <td>{{ a['id'] }}</td>
+            <td>{{ a['user_id'] }}</td>
+            <td>{{ a['acct_number'] }}</td>
+            <td>UGX {{ '%0.2f' % a['balance'] }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

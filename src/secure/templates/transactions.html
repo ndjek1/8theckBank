@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Transactions &mdash; 8TechBank{% endblock %}
+{% block content %}
+<h1>Transaction history</h1>
+
+{# FIX 2: NO `| safe` filter — Jinja autoescapes user-supplied note. #}
+<table class="data">
+    <thead>
+        <tr><th>Date</th><th>From</th><th>To</th><th>Amount</th><th>Note</th></tr>
+    </thead>
+    <tbody>
+    {% for t in txns %}
+        <tr>
+            <td>{{ t['created_at'] }}</td>
+            <td>{{ t['from_num'] }}</td>
+            <td>{{ t['to_num'] }}</td>
+            <td>UGX {{ '%0.2f' % t['amount'] }}</td>
+            <td>{{ t['note'] }}</td>
+        </tr>
+    {% else %}
+        <tr><td colspan="5" class="muted">No transactions yet.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

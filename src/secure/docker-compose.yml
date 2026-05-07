@@ -1,0 +1,85 @@
+# --------------------------------------------------------------------------
+# 8TechBank — production-style sandboxing (Task 4.3)
+#
+# Topology:
+#                ┌──────────┐    web-net    ┌──────────────┐
+#  internet ───► │  proxy   │ ◄──────────► │  app          │
+#                │ (caddy)  │              │ (gunicorn)    │
+#                └──────────┘              └──────┬───────┘
+#                                                  │ data-net
+#                                                  ▼
+#                                          ┌──────────────┐
+#                                          │  database    │
+#                                          │ (sqlite vol) │
+#                                          └──────────────┘
+#
+# (a) only `proxy` exposes a port to the host
+# (b) `app` cannot reach the public internet (no `default` network)
+# (c) database backing-store lives on a named volume mounted r/w only into
+#     /app/var inside `app`; the rest of the filesystem is read-only
+# (d) Linux capabilities dropped, no new privileges, low pids/cpu/mem caps
+# --------------------------------------------------------------------------
+
+services:
+
+  app:
+    build: .
+    image: 8techbank-secure
+    container_name: 8techbank-secure-app
+    environment:
+      SECRET_KEY: ${SECRET_KEY:?SECRET_KEY env var must be set in .env}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET env var must be set in .env}
+      FLASK_ENV: production
+      BANK_DB_PATH: /app/var/bank.db
+    networks:
+      - web-net
+      - data-net                        # has internal: true (no egress)
+    volumes:
+      - bankdb:/app/var
+    # --- Sandbox / hardening ---
+    read_only: true                     # root FS immutable
+    tmpfs:
+      - /tmp:size=16m,mode=1777,noexec,nosuid,nodev
+    cap_drop: ["ALL"]                   # drop every Linux capability
+    security_opt:
+      - no-new-privileges:true
+    user: "10001:10001"
+    pids_limit: 100
+    mem_limit: 256m
+    mem_reservation: 128m
+    cpus: 0.5
+    restart: unless-stopped
+
+  proxy:
+    image: caddy:2-alpine
+    container_name: 8techbank-secure-proxy
+    depends_on: [app]
+    ports:
+      - "8443:443"                      # only port exposed to host
+      - "8080:80"
+    networks:
+      - web-net
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    cap_drop: ["ALL"]
+    cap_add:                            # only what Caddy actually needs
+      - NET_BIND_SERVICE
+    security_opt: [ "no-new-privileges:true" ]
+    pids_limit: 50
+    mem_limit: 128m
+    cpus: 0.25
+    restart: unless-stopped
+
+networks:
+  web-net:
+    driver: bridge
+  data-net:
+    driver: bridge
+    internal: true                      # no internet egress for app
+
+volumes:
+  bankdb:
+  caddy-data:
+  caddy-config:

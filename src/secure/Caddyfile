@@ -1,0 +1,32 @@
+# Reverse proxy for the secure 8TechBank build.
+# Caddy 2 obtains automatic HTTPS and forwards to the app container.
+# When running locally without a public hostname, Caddy issues an internal
+# certificate so the cookies' Secure flag is satisfied.
+
+{
+    auto_https disable_redirects
+    admin off
+}
+
+:443 {
+    tls internal
+    encode gzip
+
+    # Strict headers in addition to those Flask sets
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Content-Type-Options    "nosniff"
+        X-Frame-Options           "DENY"
+        Referrer-Policy           "no-referrer"
+        Permissions-Policy        "geolocation=(), microphone=(), camera=()"
+        -Server
+    }
+
+    reverse_proxy app:5001 {
+        header_up X-Forwarded-Proto {scheme}
+    }
+}
+
+:80 {
+    redir https://{host}{uri} 308
+}

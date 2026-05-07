@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>{% block title %}8TechBank (Vulnerable Build){% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header class="topbar">
+    <div class="brand">
+        <a href="{{ url_for('index') }}">8TechBank</a>
+        <span class="env-badge">VULNERABLE BUILD</span>
+    </div>
+    <nav>
+        {% if current_user %}
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('transfer') }}">Transfer</a>
+            <a href="{{ url_for('transactions') }}">Transactions</a>
+            <a href="{{ url_for('search') }}?q=">Search</a>
+            <a href="{{ url_for('admin') }}">Admin</a>
+            <span class="user">Hi, {{ current_user['username'] }}</span>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        {% else %}
+            <a href="{{ url_for('login') }}">Login</a>
+            <a href="{{ url_for('register') }}">Register</a>
+        {% endif %}
+    </nav>
+</header>
+<main class="container">
+    {% block content %}{% endblock %}
+</main>
+<footer class="footer">
+    &copy; 2026 8TechBank Demo &mdash; Academic use only.
+</footer>
+</body>
+</html>

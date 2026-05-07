@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Transfer &mdash; 8TechBank{% endblock %}
+{% block content %}
+<h1>New fund transfer</h1>
+{% if error %}<p class="alert">{{ error }}</p>{% endif %}
+
+<!-- VULNERABLE: no CSRF token included on this state-changing form (V6) -->
+<form method="post" action="{{ url_for('transfer') }}" class="card">
+    <label>From account
+        <select name="from_account" required>
+            {% for a in accounts %}
+            <option value="{{ a['id'] }}">
+                {{ a['acct_number'] }} (UGX {{ '%0.2f' % a['balance'] }})
+            </option>
+            {% endfor %}
+        </select>
+    </label>
+    <label>To account number
+        <input type="text" name="to_account" placeholder="8TB-XXXX" required>
+    </label>
+    <label>Amount (UGX)
+        <input type="number" step="0.01" name="amount" required>
+    </label>
+    <label>Note (visible in transaction history)
+        <input type="text" name="note" maxlength="200">
+    </label>
+    <button type="submit" class="primary">Send</button>
+</form>
+{% endblock %}

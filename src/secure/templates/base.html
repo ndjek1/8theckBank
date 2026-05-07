@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>{% block title %}8TechBank (Secure Build){% endblock %}</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header class="topbar">
+    <div class="brand">
+        <a href="{{ url_for('index') }}">8TechBank</a>
+        <span class="env-badge">SECURE BUILD</span>
+    </div>
+    <nav>
+        {% if current_user %}
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('transfer') }}">Transfer</a>
+            <a href="{{ url_for('transactions') }}">Transactions</a>
+            <a href="{{ url_for('search') }}?q=">Search</a>
+            {% if current_user['role'] == 'admin' %}
+              <a href="{{ url_for('admin') }}">Admin</a>
+            {% endif %}
+            <span class="user">Hi, {{ current_user['username'] }}</span>
+            <form method="post" action="{{ url_for('logout') }}" class="inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="link">Logout</button>
+            </form>
+        {% else %}
+            <a href="{{ url_for('login') }}">Login</a>
+            <a href="{{ url_for('register') }}">Register</a>
+        {% endif %}
+    </nav>
+</header>
+<main class="container">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul class="flashes">
+          {% for m in messages %}<li>{{ m }}</li>{% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+</main>
+<footer class="footer">
+    &copy; 2026 8TechBank Demo &mdash; Academic use only.
+</footer>
+</body>
+</html>

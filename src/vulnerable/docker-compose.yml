@@ -1,0 +1,8 @@
+services:
+  vuln:
+    build: .
+    container_name: 8techbank-vuln
+    ports:
+      - "5000:5000"
+    environment:
+      - PYTHONUNBUFFERED=1
