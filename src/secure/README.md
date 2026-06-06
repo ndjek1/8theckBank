@@ -61,38 +61,7 @@ TOKEN=...
 curl http://127.0.0.1:5001/api/me -H "Authorization: Bearer $TOKEN"
 ```
 
-## Finish Task 4 checklist
 
-Run the automated verifier (20 checks — JWT, RBAC, validation, rate limit, transfer):
-
-```powershell
-cd src/secure
-.\.venv\Scripts\python.exe test_task4.py
-```
-
-Or run the full demo (tests + live API calls):
-
-```powershell
-.\run_task4_demo.ps1
-```
-
-Capture screenshots for your report:
-- `19_secure_api_jwt_token_response.png` — token JSON from `/api/auth/token`
-- `20_secure_api_rate_limited_429.png` — HTTP 429 on the 6th login attempt
-
-### Sandboxed Docker deployment (Task 4.3)
-
-```bash
-cd src/secure
-cp .env.example .env             # then fill in strong secrets
-docker compose up --build
-```
-
-Hardening applied:
-
-* Multi-stage build, runs as non-root uid 10001
-* Read-only root filesystem, writable only on `/tmp` (tmpfs) and
-  `/app/var` (DB volume on `data-net`)
 * All Linux capabilities dropped (`cap_drop: ALL`), `no-new-privileges`
 * CPU + memory + pids limits applied
 * `app` container is on a `data-net` with `internal: true` — no
