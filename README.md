@@ -1,6 +1,6 @@
 # 8TechBank — BSE 4202 Software Security Practical Assignment
 
-> Build · Break · Fix — a deliberately-vulnerable banking app, a portfolio
+> A deliberately-vulnerable banking app, a portfolio
 > of working exploits against it, a hardened production build with full
 > defence-in-depth, a sandboxed Docker stack, and a security assessment
 > report.
