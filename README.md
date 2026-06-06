@@ -1,98 +1,80 @@
-# 8TechBank — BSE 4202 Software Security Practical Assignment
+# 8TechBank
 
-> A deliberately-vulnerable banking app, a portfolio
-> of working exploits against it, a hardened production build with full
-> defence-in-depth, a sandboxed Docker stack, and a security assessment
-> report.
+A deliberately vulnerable online banking application developed for the **BSE 4202: Software Security** practical assignment. This repository includes the vulnerable application, exploit demonstrations, remediated secure version, API security enhancements, Docker sandboxing, and the final security assessment report.
 
-## Repository layout
+## Project Structure
 
 ```
-8TechBank/
-├── README.md                              ← this file
-├── BSE 4202_..._Assignment.pdf            ← original brief
-├── src/
-│   ├── vulnerable/                        ← Task 1 deliverable (deliberately broken)
-│   │   ├── app.py, schema.sql, seed.py
-│   │   ├── templates/, static/
-│   │   ├── requirements.txt, README.md
-│   │   ├── Dockerfile, docker-compose.yml
-│   │   └── bank.db (gen'd by seed.py)
-│   └── secure/                            ← Tasks 3 & 4 deliverable (hardened)
-│       ├── app.py, api.py, security.py
-│       ├── schema.sql, seed.py
-│       ├── templates/, static/
-│       ├── requirements.txt, README.md
-│       ├── Dockerfile, Caddyfile,
-│       │   docker-compose.yml, .env.example
-│       └── bank.db (gen'd by seed.py)
-├── exploits/                              ← Task 2 deliverable
-│   ├── exploit_a_sqli.py
-│   ├── exploit_b_xss.py
-│   ├── exploit_c_csrf.html
-│   ├── exploit_d_idor.py
-│   ├── run_all_against_test_clients.py    ← regression harness
-│   └── README.md
-├── screenshots/                           ← evidence (place your PNGs here)
-│   ├── README.md (naming convention)
-│   └── exploit_results_console.txt        ← textual evidence
-└── report/
-    ├── 8TechBank_Security_Assessment.md   ← main 8–12 page report (Task 5)
-    ├── vulnerability_assessment_matrix.md ← Task 1 matrix (Appendix A)
-    └── README.md                          ← Markdown→PDF instructions
+src/
+├── vulnerable/    # Vulnerable application (Task 1 and Task 2)
+└── secure/        # Secure application (Tasks 3 & 4)
+
+exploits/          # Exploit demonstrations (Task 2)
+
+report/            # Security assessment report (Task 5)
 ```
 
-## Quick start
-
-### Vulnerable build (port 5000)
+## Running the Vulnerable Application
 
 ```bash
 cd src/vulnerable
-python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-python seed.py        # creates bank.db with sample users
-python app.py         # http://localhost:5000
-```
 
-### Secure build (port 5001)
+python -m venv .venv
+source .venv/bin/activate      # Linux/macOS
+# .venv\Scripts\activate       # Windows
 
-```bash
-cd src/secure
-python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
+
 python seed.py
-python app.py         # http://127.0.0.1:5001
+python app.py
 ```
 
-### Sample logins (both builds)
+Open:
 
-| Username | Password   | Role  |
-| -------- | ---------- | ----- |
-| alice    | alice123   | user  |
-| bob      | bobpass    | user  |
-| carol    | carolpw    | user  |
-| admin    | admin123   | admin |
-
-### Run all exploits against both builds (regression test)
-
-```bash
-# from repo root, in the secure venv (it has all deps)
-. src/secure/.venv/bin/activate
-python exploits/run_all_against_test_clients.py
+```text
+http://127.0.0.1:5000
 ```
 
-### Sandboxed Docker stack (Task 4.3)
+## Running the Secure Application
 
 ```bash
 cd src/secure
-cp .env.example .env && $EDITOR .env       # set strong SECRET_KEY + JWT_SECRET
-docker compose up --build
-# Caddy listens on 8080 (HTTP redirect) and 8443 (HTTPS)
+
+python -m venv .venv
+source .venv/bin/activate      # Linux/macOS
+# .venv\Scripts\activate       # Windows
+
+pip install -r requirements.txt
+
+python seed.py
+python app.py
 ```
 
-## Ethical use notice
+Open:
 
-This codebase contains intentional vulnerabilities. **Run only on your
-own localhost.** Using these techniques against any system you do not
-own and have written permission to test is a criminal offence under
-Uganda's Computer Misuse Act, 2011.
+```text
+http://127.0.0.1:5001
+```
+
+## Sample Accounts
+
+| Username | Password |
+|----------|----------|
+| alice | alice123 |
+| bob | bobpass |
+| carol | carolpw |
+| admin | admin123 |
+
+## Docker Deployment
+
+```bash
+cd src/secure
+
+cp .env.example .env
+docker compose up --build
+```
+
+
+## Ethical Use
+
+This project contains intentionally vulnerable code for educational purposes. Run it only in a controlled local environment and only on systems you own or have explicit permission to test.
