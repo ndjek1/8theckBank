@@ -1,21 +1,37 @@
 # Reports
 
-| File | Purpose |
-| ---- | ------- |
-| `8TechBank_Security_Assessment.md` | The main 8-12 page report (Task 5). Convert to PDF before submission (`pandoc -o 8TechBank_Security_Assessment.pdf 8TechBank_Security_Assessment.md` or use any Markdown-to-PDF tool). |
-| `vulnerability_assessment_matrix.md` | Standalone matrix referenced from §3 / Appendix A. |
+# 8TechBank Security Assessment Report
 
-## Converting Markdown → PDF
+This repository contains the final security assessment report for the **8TechBank** web application developed as part of the **BSE 4202: Software Security** coursework.
 
-```bash
-# install once
-sudo apt install -y pandoc texlive-xetex   # Debian/Ubuntu
-# convert
-pandoc report/8TechBank_Security_Assessment.md \
-       -o report/8TechBank_Security_Assessment.pdf \
-       --from markdown --pdf-engine=xelatex --toc --number-sections
-```
+## Overview
 
-If you don't want to install LaTeX, paste the Markdown into Google Docs
-or Word and "Save as PDF". The report uses only Markdown features that
-render correctly in either tool.
+The assessment evaluates both the vulnerable and secure versions of the application. It documents the identification, exploitation, remediation, and verification of security vulnerabilities based on OWASP security principles and secure software development practices.
+
+## Topics Covered
+
+* SQL Injection (SQLi)
+* Cross-Site Scripting (XSS)
+* Cross-Site Request Forgery (CSRF)
+* Insecure Direct Object Reference (IDOR)
+* Vulnerability Remediation
+* API Security
+* Docker Sandboxing
+* OWASP ASVS Compliance
+
+## Team Members
+
+| Member | Responsibility                  |
+| ------ | ------------------------------- |
+| Alvin Ssenyonjo  | Vulnerability Assessment Matrix |
+| Ampaire Stacey  | Exploit Development and Testing |
+| Ndejkornom Victoire    | Remediation and Verification    |
+| Cyiza Ndoli Jean De Dieu  | API Security and Sandboxing     |
+
+
+## Course Information
+
+**Course:** BSE 4202 – Software Security
+**Institution:** Makerere University
+**Academic Year:** 2025/26
+
