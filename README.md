@@ -90,36 +90,6 @@ docker compose up --build
 # Caddy listens on 8080 (HTTP redirect) and 8443 (HTTPS)
 ```
 
-## How this maps to the assignment
-
-| Task | Deliverable | Where |
-| ---- | ----------- | ----- |
-| Task 1 | Build vulnerable app + 8+ findings + matrix | `src/vulnerable/`, `report/vulnerability_assessment_matrix.md` |
-| Task 2 | Working PoC exploits A-D | `exploits/`, `screenshots/exploit_results_console.txt` |
-| Task 3 | Six fixes with before/after | `src/secure/` + Section 4 of the report |
-| Task 4 | JWT API + rate limit + sandboxing | `src/secure/api.py`, `Dockerfile`, `docker-compose.yml`, `Caddyfile` |
-| Task 5 | 8-12 page assessment report | `report/8TechBank_Security_Assessment.md` |
-
-## Submission checklist (per the brief)
-
-* [ ] Replace `<your group / name(s)>` placeholders in:
-    * `report/8TechBank_Security_Assessment.md` (header)
-    * `report/vulnerability_assessment_matrix.md` (assessor line)
-* [ ] Capture screenshots referenced in the report (see
-      `screenshots/README.md` for the suggested naming).
-* [ ] Update **§7 AI Tool Usage Declaration** to match what your group
-      actually did. Default text reflects use of an AI coding assistant
-      for boilerplate; edit before submission.
-* [ ] Convert `report/8TechBank_Security_Assessment.md` to PDF
-      (see `report/README.md`).
-* [ ] Re-run `python exploits/run_all_against_test_clients.py` and re-seed
-      both DBs (`python src/{vulnerable,secure}/seed.py`).
-* [ ] Delete the `.venv/` folders before zipping (they aren't needed).
-* [ ] Zip as `StudentID_CSC4207_Assignment.zip` (per §1 Submission
-      Requirements). Note: the brief says `CSC4207`, which is likely a
-      typo — verify with the lecturer; code is BSE 4202.
-* [ ] Upload to MUELE before **13 May 2026, 23:59 EAT**.
-
 ## Ethical use notice
 
 This codebase contains intentional vulnerabilities. **Run only on your
