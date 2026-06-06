@@ -22,7 +22,7 @@ import bcrypt
 import jwt
 from flask import Blueprint, current_app, g, jsonify, request
 from flask_limiter import Limiter
-from pydantic import BaseModel, EmailStr, Field, ValidationError
+from pydantic import BaseModel, Field, ValidationError
 
 
 # ---------------------------------------------------------------------------
@@ -156,27 +156,36 @@ class TransferRequest(BaseModel):
 # ---------------------------------------------------------------------------
 api_bp = Blueprint("api", __name__, url_prefix="/api")
 
-# The limiter object is created in app.py and bound here so that decorators
-# above the blueprint routes have something concrete to attach to.
-_limiter: Optional[Limiter] = None
+# The limiter object is created in app.py; rate limits are applied there
+# after the blueprint is registered (see init_api_limiter).
 
 
-def init_api_limiter(limiter: Limiter) -> None:
-    """Called from app.py once the limiter exists."""
-    global _limiter
-    _limiter = limiter
+# Rate limits keyed by view function __name__; applied after blueprint registration.
+_RATE_LIMITS: dict[str, list[str]] = {}
+
+
+def init_api_limiter(limiter: Limiter, app) -> None:
+    """Apply stored rate limits to registered API view functions."""
+    for endpoint, view_func in list(app.view_functions.items()):
+        if not endpoint.startswith("api."):
+            continue
+        func = view_func
+        while hasattr(func, "__wrapped__"):
+            func = func.__wrapped__
+        limits = _RATE_LIMITS.get(func.__name__)
+        if not limits:
+            continue
+        wrapped = view_func
+        for lim in limits:
+            wrapped = limiter.limit(lim)(wrapped)
+        app.view_functions[endpoint] = wrapped
 
 
 def _rl(*limits: str):
-    """Wrap flask-limiter so we can decorate even before the limiter exists."""
+    """Mark a view with rate limits; applied in init_api_limiter()."""
     def deco(view):
-        @wraps(view)
-        def wrapped(*args, **kwargs):
-            return view(*args, **kwargs)
-        if _limiter is not None:
-            for lim in limits:
-                wrapped = _limiter.limit(lim)(wrapped)
-        return wrapped
+        _RATE_LIMITS[view.__name__] = list(limits)
+        return view
     return deco
 
 
@@ -235,7 +244,10 @@ def auth_token():
 @api_bp.post("/auth/refresh")
 @_rl("20 per minute")
 def auth_refresh():
-    body = RefreshRequest.model_validate(request.get_json(silent=True) or {})
+    try:
+        body = RefreshRequest.model_validate(request.get_json(silent=True) or {})
+    except ValidationError as exc:
+        return _validation_err(exc)
     claims = decode_token(body.refresh_token, expected_type="refresh")
     user_id = int(claims["sub"])
     role    = claims["role"]
@@ -272,7 +284,10 @@ def my_accounts():
 @jwt_required
 @_rl("10 per minute")
 def api_transfer():
-    body = TransferRequest.model_validate(request.get_json(silent=True) or {})
+    try:
+        body = TransferRequest.model_validate(request.get_json(silent=True) or {})
+    except ValidationError as exc:
+        return _validation_err(exc)
     db = _db()
 
     src = db.execute(

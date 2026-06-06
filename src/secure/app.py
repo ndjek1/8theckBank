@@ -85,8 +85,8 @@ def create_app() -> Flask:
 
     # Mount JSON API blueprint (Task 4)
     from api import api_bp, init_api_limiter
-    init_api_limiter(limiter)
     app.register_blueprint(api_bp)
+    init_api_limiter(limiter, app)
 
     register_routes(app, limiter)
     return app

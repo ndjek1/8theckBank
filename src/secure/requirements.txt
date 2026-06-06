@@ -1,3 +1,5 @@
+# Pinned for Python 3.12 (Docker/production). On Python 3.14 locally, run:
+#   pip install Flask Werkzeug Jinja2 itsdangerous click bcrypt PyJWT Flask-Limiter pydantic email-validator
 Flask==3.0.3
 Werkzeug==3.0.3
 Jinja2==3.1.4
