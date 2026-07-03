@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Search{% endblock %}
+
+{% block content %}
+<h1>Knowledge-base Search</h1>
+
+<form method="GET" action="{{ url_for('search') }}">
+    <input
+        type="text"
+        name="q"
+        value="{{ query }}"
+        placeholder="Search..."
+    >
+    <button type="submit">Search</button>
+</form>
+
+<!-- Intentionally vulnerable -->
+<h2>Results for: {{ query|safe }}</h2>
+
+<p>No results found in 8TechBank knowledge base.</p>
+{% endblock %}

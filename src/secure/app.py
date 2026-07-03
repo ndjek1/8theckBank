@@ -1,18 +1,5 @@
 """
-8TechBank — SECURE build.
-
-Implements every fix required by Task 3 of the BSE 4202 Practical Assignment:
-
-  Fix 1: Parameterised SQL queries (no string concatenation)
-  Fix 2: Output encoding (Jinja2 autoescape) + Content-Security-Policy
-  Fix 3: CSRF tokens on all state-changing forms
-  Fix 4: Authorisation (login + ownership/role checks)
-  Fix 5: bcrypt password hashing (>=12 rounds)
-  Fix 6: Security headers + hardened session cookies (HttpOnly/Secure/
-         SameSite=Strict + 15 min idle timeout)
-
-Plus, for Task 4, see api.py (mounted on /api/...): JWT auth, RBAC, rate
-limiting, Pydantic input validation.
+Secure implementation of the 8TechBank application.
 """
 from __future__ import annotations
 
@@ -48,15 +35,10 @@ from security import (
 
 DB_PATH = Path(os.environ.get("BANK_DB_PATH", Path(__file__).parent / "bank.db"))
 
-
-# ---------------------------------------------------------------------------
-# App factory
-# ---------------------------------------------------------------------------
+# Create and configure the Flask application
 def create_app() -> Flask:
     app = Flask(__name__)
 
-    # Fix 7: secret comes from environment, never hard-coded. Falls back to
-    # a randomly-generated value for local development.
     app.config["SECRET_KEY"] = os.environ.get(
         "SECRET_KEY", os.urandom(32).hex()
     )
@@ -64,8 +46,6 @@ def create_app() -> Flask:
     # Fix 6: hardened cookies + 15 min session timeout
     configure_secure_session(app)
 
-    # During development over plain HTTP we relax SESSION_COOKIE_SECURE so
-    # that the browser still sends the cookie. PRODUCTION must always be HTTPS.
     if os.environ.get("FLASK_ENV", "development") == "development":
         app.config["SESSION_COOKIE_SECURE"] = False
 
@@ -92,9 +72,7 @@ def create_app() -> Flask:
     return app
 
 
-# ---------------------------------------------------------------------------
-# DB helpers
-# ---------------------------------------------------------------------------
+#DB
 def get_db() -> sqlite3.Connection:
     if "db" not in g:
         g.db = sqlite3.connect(DB_PATH)
@@ -117,10 +95,7 @@ def current_user():
         (session["user_id"],),
     ).fetchone()
 
-
-# ---------------------------------------------------------------------------
-# Routes
-# ---------------------------------------------------------------------------
+#ROUTES
 def register_routes(app: Flask, limiter: Limiter) -> None:
 
     app.teardown_appcontext(close_db)
@@ -237,7 +212,6 @@ def register_routes(app: Flask, limiter: Limiter) -> None:
         if account is None:
             abort(404)
 
-        # FIX 4: only owners (or admins) may view this account
         own_account_required(account["user_id"])
 
         owner = db.execute(
@@ -253,7 +227,6 @@ def register_routes(app: Flask, limiter: Limiter) -> None:
             "account.html", account=account, owner=owner, txns=txns
         )
 
-    # ----- Fix 1 + 3 + 4 + 11: secure transfer ------------------------------
     @app.route("/transfer", methods=["GET", "POST"])
     @login_required
     @limiter.limit("30 per minute", methods=["POST"])

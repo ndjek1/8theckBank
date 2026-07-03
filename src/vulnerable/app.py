@@ -1,24 +1,6 @@
 """
 8TechBank — VULNERABLE build.
 
-WARNING: This file intentionally contains insecure code patterns required by
-BSE 4202 Practical Assignment, Task 1 (Section 1.2). DO NOT deploy. Run only
-on localhost for academic exploitation exercises.
-
-Mapped vulnerabilities (see /report/vulnerability_assessment_matrix.md):
-
-  V1 SQL Injection in /login                    (CWE-89,  OWASP A03:2021)
-  V2 Reflected XSS in /search                   (CWE-79,  OWASP A03:2021)
-  V3 Stored XSS in transaction notes            (CWE-79,  OWASP A03:2021)
-  V4 Broken Access Control / IDOR in /account   (CWE-639, OWASP A01:2021)
-  V5 Plaintext password storage                 (CWE-256, OWASP A02:2021)
-  V6 Missing CSRF protection on /transfer       (CWE-352, OWASP A01:2021)
-  V7 Weak / hard-coded session secret + insecure cookie flags (CWE-798, A07)
-  V8 Verbose error messages (debug=True)        (CWE-209, OWASP A05:2021)
-  V9 No authorisation on /admin                 (CWE-285, OWASP A01:2021)
-  V10 Open redirect in /login `next` parameter  (CWE-601, OWASP A01:2021)
-  V11 No input validation on transfer amount    (CWE-20,  OWASP A03:2021)
-  V12 No rate limiting on /login                (CWE-307, OWASP A07:2021)
 """
 from __future__ import annotations
 
@@ -36,7 +18,6 @@ from flask import (
     abort,
 )
 
-# --- V7: hard-coded, weak session secret -----------------------------------
 SECRET_KEY = "8techbank-dev-secret"                     # CWE-798
 
 DB_PATH = Path(__file__).parent / "bank.db"
@@ -49,9 +30,7 @@ app.config["SESSION_COOKIE_SECURE"]   = False
 app.config["SESSION_COOKIE_SAMESITE"] = None
 
 
-# ---------------------------------------------------------------------------
-# Database helpers
-# ---------------------------------------------------------------------------
+#DB
 def get_db() -> sqlite3.Connection:
     if "db" not in g:
         g.db = sqlite3.connect(DB_PATH)
@@ -79,9 +58,7 @@ def inject_user():
     return {"current_user": current_user()}
 
 
-# ---------------------------------------------------------------------------
-# Public routes
-# ---------------------------------------------------------------------------
+#PUBLIC ROUTES
 @app.route("/")
 def index():
     if current_user():
@@ -155,10 +132,7 @@ def register():
             error = "Username already taken"
     return render_template("register.html", error=error)
 
-
-# ---------------------------------------------------------------------------
-# Authenticated area
-# ---------------------------------------------------------------------------
+#Authenticated area
 def require_login():
     if "user_id" not in session:
         return redirect(url_for("login"))
@@ -281,16 +255,8 @@ def transactions():
 # --- Pattern 2: Reflected XSS in /search (V2) ------------------------------
 @app.route("/search")
 def search():
-    # VULNERABLE: input rendered raw (CWE-79). Note we deliberately bypass
-    # Jinja autoescaping by returning a raw string instead of a template.
     query = request.args.get("q", "")
-    return (
-        f"<!doctype html><html><head><title>Search</title></head>"
-        f"<body><h2>Results for: {query}</h2>"
-        f"<p>No results found in 8TechBank knowledge base.</p>"
-        f"<p><a href='/dashboard'>Back to dashboard</a></p>"
-        f"</body></html>"
-    )
+    return render_template("search.html", query=query)
 
 
 # --- V9: Admin panel without authorisation check --------------------------
